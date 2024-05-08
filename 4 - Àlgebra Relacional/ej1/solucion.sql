@@ -1,0 +1,4 @@
+A = EMPLEATS(NUM_EMPL = 2);
+B = A*DEPARTAMENTS;
+C = B*PROJECTES;
+R = C[Nom_dpt, Nom_proj];
