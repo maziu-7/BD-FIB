@@ -1,0 +1,79 @@
+Execució 1:
+    L'execució del programa no ha tingut cap efecte ja que un cop executat l'insert, s'afegeix la fila a la taula professors però justament després es desfà la sentència a causa del rollback. Per tant, la taula professors es queda igual que abans d'executar el programa.
+
+Execució 2:
+    En aquest cas, després de la sentència de l'insert, si que s'afegeix la fila a la taula professors un cop executat el programa, ja que ara en lloc de rollback fem commit, per tant, tots el canvis fets (sempre i quan no salti una excepció) es mantenen.
+
+Execució 3:
+    "Excepcio: El getSQLState es: 23505. El getMessage es: ERROR: duplicate key value violates unique constraint "professors_pkey". Detail: Key (dni)=(555                                               ) already exists."
+
+L'execució del programa no ha tingut cap efecte sobre la taula professors ja que ha saltat una excepció d'una violació de la primary key del DNI, ja que estem intentant inserir un professor amb un DNI que ja existeix a la taula professors. Per tant, la sentència no ha sigut realitzada correctament.
+
+Per obtenir el missatge "El professor ja existeix", haurem de modificar la part del codi on es tracten les excepcions de la següent manera:
+
+catch (SQLException se)
+	   {
+			if (se.getSQLState().equals("23505")) {
+				System.out.println("El professor ja existeix");
+			}
+			else {
+				System.out.println ("Excepcio: ");System.out.println ();
+				System.out.println ("El getSQLState es: " + se.getSQLState());
+				System.out.println ();
+				System.out.println ("El getMessage es: " + se.getMessage());
+			}
+	   }
+
+Execució 4:
+
+Un cop executat el programa, aquest és el resultat del select:
+
+111                                                ruth                                              
+222                                                ona                                               
+333                                                anna
+
+El resultat és correcte ja que son aquests els professors amb un número de telèfon menor a 3334.
+
+// IMPLEMENTAR
+// printar el dni i el nom dels professors que tenen els tel�fons amb n�mero inferior al que s'indica en la variable buscaTelf
+// en cas que no hi hagi cap professor amb aquest tel�fon printar "NO TROBAT"     
+       String buscaTelf="3334";    
+       //inicialitzem el result set per iterar sobre tots els resultats del select
+       ResultSet r = null;
+       //preparem la sentència
+       PreparedStatement ps = c.prepareStatement("select dni, nomprof "+
+    		   									 "from professors "+
+    		   									 "where telefon < '"+buscaTelf+"'");
+       //guardem el resultat de la consulta al ResultSet
+       r = ps.executeQuery();
+       
+       //si el ResultSet retorna null, significa que no hi ha cap professors amb telèfon < buscaTelf
+       if (r.equals(null)) { System.out.println("NO TROBAT"); }
+
+       //si el return és diferent de null, significa que tenim com a mínim un resultat
+       else {
+           //iterem per totes les files del resultat del select
+    	   while (r.next()) {
+                   //imprimim el dni i el nomprof de la fila actual
+    		   System.out.println(r.getString("dni")+" "+r.getString("nomprof"));
+    	   }
+       }
+       
+	   // Rollback i desconnexio de la base de dades
+       	   c.commit();
+	   c.close();
+	   System.out.println ("Rollback i desconnexio realitzats correctament.");
+	   }
+	
+	catch (SQLException se)
+	   {
+			if (se.getSQLState().equals("23505")) {
+				System.out.println("El professor ja existeix");
+			}
+			else {
+				System.out.println ("Excepcio: ");System.out.println ();
+				System.out.println ("El getSQLState es: " + se.getSQLState());
+				System.out.println ();
+				System.out.println ("El getMessage es: " + se.getMessage());
+			}
+	   }
